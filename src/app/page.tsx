@@ -4,16 +4,16 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 
-import app from "../../firebase-config";
+import app from "../../firebase-config.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 import {
-  BarChartHorizontal,
-  BatteryCharging,
+  SquareLibrary,
+  Trophy,
   CircleHelp,
   Layers,
   WandSparkles,
-  ZoomIn,
+  Timer,
 } from "lucide-react";
 
 import CodifyLogo from "./assets/CodifyNewLogo.png";
@@ -25,9 +25,11 @@ export default function Home() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log(result)
-      // ...
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const user = result.user;
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      console.log(credential);
+      console.log(user);
+      
     } catch (error: any) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -38,13 +40,13 @@ export default function Home() {
       title: "Topic-Based Quizzes",
       description:
         "Choose from a range of development topics like web development, data science, and cybersecurity, tailored for developers at all skill levels to sharpen their expertise.",
-      icon: <ZoomIn className="size-6" />,
+      icon: <SquareLibrary className="size-6" />,
     },
     {
       title: "Global Leaderboards",
       description:
         "Compete with developers worldwide and see where you stand. Track your progress, compare scores, and strive for the top in your favorite topics.",
-      icon: <BarChartHorizontal className="size-6" />,
+      icon: <Trophy className="size-6" />,
     },
     {
       title: "Difficulty Adjustment",
@@ -56,7 +58,7 @@ export default function Home() {
       title: "Timed Quiz",
       description:
         "Challenge yourself with fast-paced, tech-focused questions that push your knowledge and speed. Perfect for testing your expertise in a high-stakes environment!?",
-      icon: <WandSparkles className="size-6" />,
+      icon: <Timer className="size-6" />,
     },
     {
       title: "NULL",
@@ -66,7 +68,7 @@ export default function Home() {
     {
       title: "NULL",
       description: "NULL",
-      icon: <BatteryCharging className="size-6" />,
+      icon: <Timer className="size-6" />,
     },
   ];
 
