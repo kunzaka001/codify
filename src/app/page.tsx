@@ -11,8 +11,6 @@ import {
   SquareLibrary,
   Trophy,
   CircleHelp,
-  Layers,
-  WandSparkles,
   Timer,
 } from "lucide-react";
 
@@ -63,7 +61,7 @@ export default function Home() {
     {
       title: "NULL",
       description: "NULL",
-      icon: <Layers className="size-6" />,
+      icon: <Timer className="size-6" />,
     },
     {
       title: "NULL",
