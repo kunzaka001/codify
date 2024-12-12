@@ -28,6 +28,7 @@ export default function Home() {
       console.log(credential);
       console.log(user);
       
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error signing in with Google:", error.message);
     }
