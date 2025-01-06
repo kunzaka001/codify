@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 
-import app from "../../firebase-config.js";
+import app from "../lib/firebase-config.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 import {
@@ -12,12 +12,13 @@ import {
   Trophy,
   CircleHelp,
   Timer,
+  BotMessageSquare,
+  BrainCog,
 } from "lucide-react";
 
 import CodifyLogo from "./assets/CodifyNewLogo.png";
 
 export default function Home() {
-
   const signinWithGoogle = async () => {
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
@@ -27,8 +28,8 @@ export default function Home() {
       const credential = GoogleAuthProvider.credentialFromResult(result);
       console.log(credential);
       console.log(user);
-      
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -60,14 +61,14 @@ export default function Home() {
       icon: <Timer className="size-6" />,
     },
     {
-      title: "NULL",
-      description: "NULL",
-      icon: <Timer className="size-6" />,
+      title: "LLM Helper",
+      description: "Large Language Model Helper",
+      icon: <BotMessageSquare className="size-6" />,
     },
     {
-      title: "NULL",
-      description: "NULL",
-      icon: <Timer className="size-6" />,
+      title: "Machine Learning Analysis",
+      description: "Use Machine Learning Model to evaluating somethings",
+      icon: <BrainCog className="size-6" />,
     },
   ];
 
