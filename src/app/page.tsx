@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link.js";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +22,85 @@ import {
 import CodifyLogo from "./assets/CodifyNewLogo.png";
 
 export default function Home() {
+  const router = useRouter();
+  const dbName = "CodifyDB";
+  const storeName = "userData";
+
+  useEffect(() => {
+    const checkIfDataExists = async () => {
+      try {
+        const db = (await openDatabase()) as IDBDatabase;
+
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          if (request.result && request.result.length > 0) {
+            router.push("/home");
+          } else {
+            console.log("No data found in the store.");
+          }
+        };
+
+        request.onerror = (event: any) => {
+          console.error("Error checking IndexedDB", event.target.error);
+        };
+      } catch (error) {
+        console.error("Error opening database:", error);
+      }
+    };
+
+    checkIfDataExists();
+  }, [router]);
+
+  async function openDatabase() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, 1);
+
+      request.onupgradeneeded = (event: any) => {
+        const db = event.target.result;
+
+        if (!db.objectStoreNames.contains(storeName)) {
+          db.createObjectStore(storeName, { keyPath: "id" });
+        }
+      };
+
+      request.onsuccess = () => {
+        resolve(request.result);
+      };
+
+      request.onerror = (event: any) => {
+        reject(event.target.error);
+      };
+    });
+  }
+
+  async function addOrUpdateUserData(data: any) {
+    const db = (await openDatabase()) as IDBDatabase;
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(storeName, "readwrite");
+      const store = transaction.objectStore(storeName);
+
+      if (!data.id) {
+        reject(new Error("User data must contain an 'id' field"));
+        return;
+      }
+
+      const request = store.put(data);
+
+      request.onsuccess = () => {
+        resolve("Data saved successfully!");
+      };
+
+      request.onerror = (event: any) => {
+        reject(event.target.error);
+      };
+    });
+  }
+
   const signinWithGoogle = async () => {
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
@@ -26,8 +108,11 @@ export default function Home() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const credential = GoogleAuthProvider.credentialFromResult(result);
-      console.log(credential);
-      console.log(user);
+      openDatabase();
+      addOrUpdateUserData({ id: user.uid, email: user.email });
+      if (router) {
+        router.push("/home");
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -95,13 +180,14 @@ export default function Home() {
                 >
                   Dive In!
                 </Button>
-                <Button
-                  variant="outline"
-                  className="w-full jello-vertical sm:w-auto"
-                >
-                  Github
-                  {/*<ArrowDownRight className="ml-2 size-4" />*/}
-                </Button>
+                <Link href="https://github.com/kunzaka001/codify">
+                  <Button
+                    variant="outline"
+                    className="w-full jello-vertical sm:w-auto"
+                  >
+                    Github
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="rotate-in-center">
