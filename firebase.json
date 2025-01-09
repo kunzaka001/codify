@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "build",
+    "public": "out",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -8,8 +8,19 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/**",
         "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(css|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       }
     ]
   }
