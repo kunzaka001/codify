@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link.js";
 import { useRouter } from "next/navigation";
@@ -20,6 +20,11 @@ import {
 } from "lucide-react";
 
 import CodifyLogo from "./assets/CodifyNewLogo.png";
+
+interface UserData {
+  id: string;
+  email: string | null;
+}
 
 export default function Home() {
   const router = useRouter();
@@ -44,8 +49,14 @@ export default function Home() {
           }
         };
 
-        request.onerror = (event: any) => {
-          console.error("Error checking IndexedDB", event.target.error);
+        request.onerror = (event: Event) => {
+          const errorEvent = event as ErrorEvent;
+          if (errorEvent.target) {
+            console.error(
+              "Error checking IndexedDB",
+              (errorEvent.target as IDBRequest).error
+            );
+          }
         };
       } catch (error) {
         console.error("Error opening database:", error);
@@ -56,11 +67,11 @@ export default function Home() {
   }, [router]);
 
   async function openDatabase() {
-    return new Promise((resolve, reject) => {
+    return new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open(dbName, 1);
 
-      request.onupgradeneeded = (event: any) => {
-        const db = event.target.result;
+      request.onupgradeneeded = (event: Event) => {
+        const db = (event.target as IDBRequest).result as IDBDatabase;
 
         if (!db.objectStoreNames.contains(storeName)) {
           db.createObjectStore(storeName, { keyPath: "id" });
@@ -68,19 +79,22 @@ export default function Home() {
       };
 
       request.onsuccess = () => {
-        resolve(request.result);
+        resolve(request.result as IDBDatabase);
       };
 
-      request.onerror = (event: any) => {
-        reject(event.target.error);
+      request.onerror = (event: Event) => {
+        const errorEvent = event as ErrorEvent;
+        if (errorEvent.target) {
+          reject((errorEvent.target as IDBRequest).error);
+        }
       };
     });
   }
 
-  async function addOrUpdateUserData(data: any) {
+  async function addOrUpdateUserData(data: UserData) {
     const db = (await openDatabase()) as IDBDatabase;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       const transaction = db.transaction(storeName, "readwrite");
       const store = transaction.objectStore(storeName);
 
@@ -95,8 +109,11 @@ export default function Home() {
         resolve("Data saved successfully!");
       };
 
-      request.onerror = (event: any) => {
-        reject(event.target.error);
+      request.onerror = (event: Event) => {
+        const errorEvent = event as ErrorEvent;
+        if (errorEvent.target) {
+          reject((errorEvent.target as IDBRequest).error);
+        }
       };
     });
   }
@@ -107,16 +124,19 @@ export default function Home() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      const credential = GoogleAuthProvider.credentialFromResult(result);
       openDatabase();
       addOrUpdateUserData({ id: user.uid, email: user.email });
       if (router) {
         router.push("/home");
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error signing in with Google:", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error signing in with Google:", error.message);
+      } else {
+        console.error(
+          "An unknown error occurred while signing in with Google."
+        );
+      }
     }
   };
 
@@ -152,7 +172,7 @@ export default function Home() {
     },
     {
       title: "Machine Learning Analysis",
-      description: "Use Machine Learning Model to evaluating somethings",
+      description: "Use Machine Learning Model to evaluate something",
       icon: <BrainCog className="size-6" />,
     },
   ];
