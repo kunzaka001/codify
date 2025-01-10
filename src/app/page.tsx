@@ -24,6 +24,7 @@ import CodifyLogo from "./assets/CodifyNewLogo.png";
 interface UserData {
   id: string;
   email: string | null;
+  userImg: string | null;
 }
 
 export default function Home() {
@@ -125,7 +126,11 @@ export default function Home() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       openDatabase();
-      addOrUpdateUserData({ id: user.uid, email: user.email });
+      addOrUpdateUserData({
+        id: user.uid,
+        email: user.email,
+        userImg: user.photoURL,
+      });
       if (router) {
         router.push("/home");
       }
@@ -167,12 +172,14 @@ export default function Home() {
     },
     {
       title: "LLM Helper",
-      description: "Large Language Model Helper",
+      description:
+        "A powerful AI-driven assistant designed to enhance learning and productivity. This Large Language Model Helper provides instant answers, coding solutions, and insightful explanations to assist developers in solving challenges efficiently.",
       icon: <BotMessageSquare className="size-6" />,
     },
     {
       title: "Machine Learning Analysis",
-      description: "Use Machine Learning Model to evaluate something",
+      description:
+        "Harness the power of Machine Learning to analyze data, identify patterns, and make intelligent evaluations. This feature leverages advanced models to provide actionable insights and predictions for complex challenges.",
       icon: <BrainCog className="size-6" />,
     },
   ];
