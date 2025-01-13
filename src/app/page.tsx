@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 
 import app from "../lib/firebase-config.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { openDatabase } from "../lib/openDatabase";
 
 import {
   SquareLibrary,
@@ -29,7 +30,6 @@ interface UserData {
 
 export default function Home() {
   const router = useRouter();
-  const dbName = "CodifyDB";
   const storeName = "userData";
 
   useEffect(() => {
@@ -67,33 +67,8 @@ export default function Home() {
     checkIfDataExists();
   }, [router]);
 
-  async function openDatabase() {
-    return new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
-
-      request.onupgradeneeded = (event: Event) => {
-        const db = (event.target as IDBRequest).result as IDBDatabase;
-
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName, { keyPath: "id" });
-        }
-      };
-
-      request.onsuccess = () => {
-        resolve(request.result as IDBDatabase);
-      };
-
-      request.onerror = (event: Event) => {
-        const errorEvent = event as ErrorEvent;
-        if (errorEvent.target) {
-          reject((errorEvent.target as IDBRequest).error);
-        }
-      };
-    });
-  }
-
   async function addOrUpdateUserData(data: UserData) {
-    const db = (await openDatabase()) as IDBDatabase;
+    const db = await openDatabase();
 
     return new Promise<string>((resolve, reject) => {
       const transaction = db.transaction(storeName, "readwrite");
