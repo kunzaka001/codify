@@ -26,6 +26,7 @@ interface UserData {
   id: string;
   email: string | null;
   userImg: string | null;
+  userName: string | null;
 }
 
 export default function Home() {
@@ -105,6 +106,7 @@ export default function Home() {
         id: user.uid,
         email: user.email,
         userImg: user.photoURL,
+        userName: user.displayName,
       });
       if (router) {
         router.push("/home");
