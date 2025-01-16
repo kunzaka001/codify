@@ -6,6 +6,26 @@ import { useRouter } from "next/navigation";
 import { openDatabase } from "@/lib/openDatabase";
 
 import placeholdUserImage from "../assets/placeholdUser.png";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface UserData {
   id: string;
@@ -67,8 +87,62 @@ export default function Home() {
             </Avatar>
           </div>
         </div>
-        <div className="flex-grow flex justify-center items-center">
+        <div className="flex-col flex-grow flex justify-center items-center">
           <h1 className="font-bold text-center">This is a home page</h1>
+          <Drawer>
+            <DrawerTrigger>
+              <Button>Play!</Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>
+                  Ready to Dive in? Choose your options!
+                </DrawerTitle>
+                <DrawerDescription>
+                  Choose your options for casual mode.
+                </DrawerDescription>
+              </DrawerHeader>
+              <div className="w-full space-y-3 px-4 py-2">
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Category</SelectLabel>
+                      <SelectItem value="code">Code</SelectItem>
+                      <SelectItem value="linux">Linux</SelectItem>
+                      <SelectItem value="react">React</SelectItem>
+                      <SelectItem value="devops">Devops</SelectItem>
+                      <SelectItem value="python">Python</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your Difficulties" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Difficulty</SelectLabel>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                      <SelectItem value="any">Any Difficulty</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <DrawerFooter>
+                <Button>Submit</Button>
+                <DrawerClose>
+                  <Button className="w-full" variant="outline">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
         </div>
       </div>
     </>
