@@ -6,6 +6,7 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "elysia": "latest"
   },
   "devDependencies": {
