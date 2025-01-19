@@ -6,6 +6,23 @@ const app = new Elysia()
     const { category = "code", limit = "10" } = query;
     const API_KEY = process.env.QUIZ_API_KEY;
 
+    const mapData = (data: any[]) => {
+      return data.map((item) => ({
+        question: item.question,
+        description: item.description,
+        answers: Object.entries(item.answers)
+          .filter(([key, value]) => value !== null)
+          .map(([key, value]) => ({ id: key, text: value })),
+        correctAnswers: Object.entries(item.correct_answers)
+          .filter(([key, value]) => value === "true")
+          .map(([key]) => key.replace("_correct", "")),
+        explanation: item.explanation,
+        tags: item.tags.map((tag: { name: string }) => tag.name),
+        difficulty: item.difficulty,
+        category: item.category,
+      }));
+    };
+
     if (!API_KEY) {
       return {
         error: "API key is missing. Please check your environment variables.",
@@ -22,7 +39,7 @@ const app = new Elysia()
       }
 
       const data = await response.json();
-      return data;
+      return mapData(data);
     } catch (error: any) {
       return { error: error.message };
     }
