@@ -1,7 +1,9 @@
 import { Elysia } from "elysia";
 import "dotenv/config";
+import { cors } from "@elysiajs/cors";
 
 const app = new Elysia()
+  .use(cors())
   .get("/quiz", async ({ query }) => {
     const { category = "code", limit = "10" } = query;
     const API_KEY = process.env.QUIZ_API_KEY;
