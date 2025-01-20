@@ -101,7 +101,11 @@ export default function Quiz_Casual() {
         <div className="pt-8">
           {currentQuestionIndex < quizData.length - 1 && (
             <Button
-              onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
+              onClick={() => {
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
+                setSelectedAnswer(null);
+                setIsAnswerCorrect(null);
+              }}
             >
               Next Question
             </Button>
