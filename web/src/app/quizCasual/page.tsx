@@ -3,6 +3,15 @@
 import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface Question {
   question: string;
@@ -67,50 +76,64 @@ export default function Quiz_Casual() {
   return (
     <>
       <title>Quiz</title>
-      <div>
-        <h2>Question: {currentQuestion.question}</h2>
-        <p>Description: {currentQuestion.description}</p>
-
-        <div className="space-x-4 pt-3">
-          {currentQuestion.answers.map((answer) => (
-            <Button
-              key={answer.id}
-              onClick={() => handleAnswerClick(answer.id)}
-              style={{
-                backgroundColor:
-                  selectedAnswer === answer.id
-                    ? isAnswerCorrect
-                      ? "green"
-                      : "red"
-                    : "",
-              }}
-            >
-              {answer.text}
-            </Button>
-          ))}
-        </div>
-
-        {isAnswerCorrect !== null && (
-          <p>
-            {isAnswerCorrect
-              ? "Correct!"
-              : "Incorrect. " + currentQuestion.explanation}
-          </p>
-        )}
-
-        <div className="pt-8">
-          {currentQuestionIndex < quizData.length - 1 && (
-            <Button
-              onClick={() => {
-                setCurrentQuestionIndex(currentQuestionIndex + 1);
-                setSelectedAnswer(null);
-                setIsAnswerCorrect(null);
-              }}
-            >
-              Next Question
-            </Button>
-          )}
-        </div>
+      <div className="flex justify-center items-center min-h-screen px-4">
+        <Card className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl">
+          <CardHeader>
+            <CardTitle>{currentQuestion.question}</CardTitle>
+            <CardDescription>{currentQuestion.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4 pt-3">
+              {currentQuestion.answers.map((answer) => (
+                <Label
+                  key={answer.id}
+                  onClick={() => handleAnswerClick(answer.id)}
+                  className={`w-full px-3 py-2 border rounded-md text-center cursor-pointer 
+                    ${
+                      selectedAnswer === answer.id
+                        ? isAnswerCorrect
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                        : "bg-gray-500 text-white"
+                    }`}
+                >
+                  {answer.text}
+                </Label>
+              ))}
+            </div>
+            {isAnswerCorrect !== null && (
+              <p className="pt-3 text-center">
+                {isAnswerCorrect
+                  ? "Correct!"
+                  : `Incorrect! ${currentQuestion.explanation}`}
+              </p>
+            )}
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            {currentQuestionIndex > 0 && (
+              <Button
+                onClick={() => {
+                  setCurrentQuestionIndex(currentQuestionIndex - 1);
+                  setSelectedAnswer(null);
+                  setIsAnswerCorrect(null);
+                }}
+              >
+                Back
+              </Button>
+            )}
+            {currentQuestionIndex < quizData.length - 1 && (
+              <Button
+                onClick={() => {
+                  setCurrentQuestionIndex(currentQuestionIndex + 1);
+                  setSelectedAnswer(null);
+                  setIsAnswerCorrect(null);
+                }}
+              >
+                Next Question
+              </Button>
+            )}
+          </CardFooter>
+        </Card>
       </div>
     </>
   );
