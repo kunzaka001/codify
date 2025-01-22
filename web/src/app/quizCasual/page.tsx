@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface Question {
   question: string;
@@ -36,6 +38,8 @@ export default function Quiz_Casual() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
 
+  const searchParams = useSearchParams();
+
   const handleAnswerClick = (answerId: string) => {
     setSelectedAnswer(answerId);
 
@@ -48,8 +52,14 @@ export default function Quiz_Casual() {
 
   useEffect(() => {
     async function fetchQuizData() {
+      const category = searchParams.get("category") || null;
+      const difficulty = searchParams.get("difficulty") || null;
+
       try {
-        const response = await fetch("http://localhost:3000/quiz");
+        const response = await fetch(
+          `http://localhost:3000/quiz?category=${category}&difficulty=${difficulty}`
+        );
+
         if (!response.ok) {
           throw new Error(`Failed to fetch data: ${response.statusText}`);
         }
@@ -64,7 +74,7 @@ export default function Quiz_Casual() {
     }
 
     fetchQuizData();
-  }, []);
+  }, [searchParams]);
 
   if (isLoading == true) {
     return <div>Loading</div>;
@@ -72,6 +82,9 @@ export default function Quiz_Casual() {
   if (error) {
     console.log(error);
   }
+
+  //LOG
+  console.log(quizData);
 
   return (
     <>
@@ -82,6 +95,7 @@ export default function Quiz_Casual() {
             <CardTitle>{currentQuestion.question}</CardTitle>
             <CardDescription>{currentQuestion.description}</CardDescription>
           </CardHeader>
+          <Separator className="mb-4" />
           <CardContent>
             <div className="flex flex-col gap-4 pt-3">
               {currentQuestion.answers.map((answer) => (
@@ -105,7 +119,7 @@ export default function Quiz_Casual() {
               <p className="pt-3 text-center">
                 {isAnswerCorrect
                   ? "Correct!"
-                  : `Incorrect! ${currentQuestion.explanation}`}
+                  : `Incorrect! Explanation: ${currentQuestion.explanation}`}
               </p>
             )}
           </CardContent>
