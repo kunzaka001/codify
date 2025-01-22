@@ -140,7 +140,7 @@ export default function Home() {
                       <SelectItem value="linux">Linux</SelectItem>
                       <SelectItem value="react">React</SelectItem>
                       <SelectItem value="devops">Devops</SelectItem>
-                      <SelectItem value="python">Python</SelectItem>
+                      <SelectItem value="django">Django</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
