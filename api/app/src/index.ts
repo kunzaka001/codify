@@ -5,8 +5,12 @@ import { cors } from "@elysiajs/cors";
 const app = new Elysia()
   .use(cors())
   .get("/quiz", async ({ query }) => {
-    const { category = "code", limit = "10" } = query;
+    const { category = "code", difficulty = "easy", limit = "10" } = query;
     const API_KEY = process.env.QUIZ_API_KEY;
+
+    const checkData = (dataCategory: any) => {
+      return dataCategory || "Not Available";
+    };
 
     const mapData = (data: any[]) => {
       return data.map((item) => ({
@@ -18,7 +22,7 @@ const app = new Elysia()
         correctAnswers: Object.entries(item.correct_answers)
           .filter(([key, value]) => value === "true")
           .map(([key]) => key.replace("_correct", "")),
-        explanation: item.explanation,
+        explanation: checkData(item.explanation),
         tags: item.tags.map((tag: { name: string }) => tag.name),
         difficulty: item.difficulty,
         category: item.category,
@@ -31,10 +35,18 @@ const app = new Elysia()
       };
     }
 
+    let response;
+
     try {
-      const response = await fetch(
-        `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&limit=${limit}`
-      );
+      if (difficulty == "any") {
+        response = await fetch(
+          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&limit=${limit}`
+        );
+      } else {
+        response = await fetch(
+          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&difficulty=${difficulty}&limit=${limit}`
+        );
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch: ${response.statusText}`);
@@ -49,7 +61,3 @@ const app = new Elysia()
   .listen(3000);
 
 console.log(`Elysia app running at http://localhost:3000`);
-
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
