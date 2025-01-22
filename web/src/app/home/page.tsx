@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 interface UserData {
   id: string;
@@ -37,6 +39,13 @@ interface UserData {
 export default function Home() {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
+
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    undefined
+  );
+  const [selectedDifficulty, setSelectedDifficulty] = useState<
+    string | undefined
+  >(undefined);
 
   useEffect(() => {
     async function fetchData() {
@@ -75,8 +84,25 @@ export default function Home() {
     router.push("/user");
   };
 
+  const handleSubmit = () => {
+    if (!selectedCategory || !selectedDifficulty) {
+      toast("Error!", {
+        description: "Cant continue please fill out all the forms",
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
+    } else {
+      router.push(
+        `/quizCasual?category=${selectedCategory}&difficulty=${selectedDifficulty}`
+      );
+    }
+  };
+
   return (
     <>
+      <Toaster position="top-center" />
       <title>Homepage</title>
       <div className="h-screen flex flex-col">
         <div className="flex justify-end p-4">
@@ -103,7 +129,7 @@ export default function Home() {
                 </DrawerDescription>
               </DrawerHeader>
               <div className="w-full space-y-3 px-4 py-2">
-                <Select>
+                <Select onValueChange={(value) => setSelectedCategory(value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your categories" />
                   </SelectTrigger>
@@ -118,7 +144,7 @@ export default function Home() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <Select>
+                <Select onValueChange={(value) => setSelectedDifficulty(value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your Difficulties" />
                   </SelectTrigger>
@@ -134,7 +160,7 @@ export default function Home() {
                 </Select>
               </div>
               <DrawerFooter>
-                <Button>Submit</Button>
+                <Button onClick={handleSubmit}>Submit</Button>
                 <DrawerClose>
                   <Button className="w-full" variant="outline">
                     Cancel
