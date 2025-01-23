@@ -12,21 +12,35 @@ const app = new Elysia()
       return dataCategory || "Not Available";
     };
 
+    const shuffleArray = (array: any[]) => {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    };
+
     const mapData = (data: any[]) => {
-      return data.map((item) => ({
-        question: item.question,
-        description: item.description,
-        answers: Object.entries(item.answers)
+      return data.map((item) => {
+        const answers = Object.entries(item.answers)
           .filter(([key, value]) => value !== null)
-          .map(([key, value]) => ({ id: key, text: value })),
-        correctAnswers: Object.entries(item.correct_answers)
-          .filter(([key, value]) => value === "true")
-          .map(([key]) => key.replace("_correct", "")),
-        explanation: checkData(item.explanation),
-        tags: item.tags.map((tag: { name: string }) => tag.name),
-        difficulty: item.difficulty,
-        category: item.category,
-      }));
+          .map(([key, value]) => ({ id: key, text: value }));
+
+        // Shuffle the answers
+        shuffleArray(answers);
+
+        return {
+          question: item.question,
+          description: item.description,
+          answers: answers,
+          correctAnswers: Object.entries(item.correct_answers)
+            .filter(([key, value]) => value === "true")
+            .map(([key]) => key.replace("_correct", "")),
+          explanation: checkData(item.explanation),
+          tags: item.tags.map((tag: { name: string }) => tag.name),
+          difficulty: item.difficulty,
+          category: item.category,
+        };
+      });
     };
 
     if (!API_KEY) {
