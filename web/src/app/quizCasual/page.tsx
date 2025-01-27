@@ -4,6 +4,9 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import QuizBox from "@/components/quizBox";
 
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+
 interface Question {
   question: string;
   description: string | null;
@@ -18,7 +21,11 @@ interface Question {
   category: string;
 }
 
-function QuizCasualComponent() {
+function QuizCasualComponent({
+  onQuestionChange,
+}: {
+  onQuestionChange: (currentIndex: number) => void;
+}) {
   const [quizData, setQuizData] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,16 +73,36 @@ function QuizCasualComponent() {
 
   return (
     <div className="flex justify-center items-center min-h-screen px-4">
-      <QuizBox quizData={quizData} />
+      <QuizBox quizData={quizData} onQuestionChange={onQuestionChange} />
     </div>
   );
 }
 
 export default function Quiz_Casual() {
+  const [percentage, setPercentage] = useState(0);
+
+  const handleQuestionChange = (currentIndex: number) => {
+    const progress = ((currentIndex + 1) / 10) * 100; // Assuming 10 total questions
+    setPercentage(progress);
+  };
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <title>Quiz</title>
-      <QuizCasualComponent />
+      <div className="absolute top-0 right-0 mr-5 mt-4 h-16 w-16">
+        <CircularProgressbar
+          minValue={0}
+          maxValue={100}
+          value={percentage}
+          text={`${percentage.toFixed(0)}%`}
+          styles={buildStyles({
+            pathColor: "#22c55e",
+            textColor: "#22c55e",
+            trailColor: "#d1fae5",
+          })}
+        />
+      </div>
+      <QuizCasualComponent onQuestionChange={handleQuestionChange} />
     </Suspense>
   );
 }

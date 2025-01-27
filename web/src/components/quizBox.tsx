@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -27,12 +27,22 @@ interface Question {
   category: string;
 }
 
-export default function QuizBox({ quizData }: { quizData: Question[] }) {
+export default function QuizBox({
+  quizData,
+  onQuestionChange,
+}: {
+  quizData: Question[];
+  onQuestionChange: (currentIndex: number) => void;
+}) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
+  const [isAnswerSelected, setIsAnswerSelected] = useState(false);
 
-  // Check if the quiz data is available
+  useEffect(() => {
+    onQuestionChange(currentQuestionIndex);
+  }, [currentQuestionIndex, onQuestionChange]);
+
   if (!quizData || quizData.length === 0) {
     return <p>No quiz data available</p>;
   }
@@ -40,9 +50,26 @@ export default function QuizBox({ quizData }: { quizData: Question[] }) {
   const currentQuestion = quizData[currentQuestionIndex];
 
   const handleAnswerClick = (answerId: string) => {
+    if (isAnswerSelected) return;
+
     setSelectedAnswer(answerId);
     const correctAnswer = currentQuestion.correctAnswers.includes(answerId);
     setIsAnswerCorrect(correctAnswer);
+    setIsAnswerSelected(true);
+  };
+
+  const handleNextQuestion = () => {
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
+    setSelectedAnswer(null);
+    setIsAnswerCorrect(null);
+    setIsAnswerSelected(false);
+  };
+
+  const handlePreviousQuestion = () => {
+    setCurrentQuestionIndex(currentQuestionIndex - 1);
+    setSelectedAnswer(null);
+    setIsAnswerCorrect(null);
+    setIsAnswerSelected(false);
   };
 
   return (
@@ -62,7 +89,10 @@ export default function QuizBox({ quizData }: { quizData: Question[] }) {
               onClick={() => handleAnswerClick(answer.id)}
               className={`w-full px-3 py-2 border rounded-md text-center cursor-pointer 
                 ${
-                  selectedAnswer === answer.id
+                  isAnswerSelected &&
+                  currentQuestion.correctAnswers.includes(answer.id)
+                    ? "bg-green-500 text-white"
+                    : selectedAnswer === answer.id
                     ? isAnswerCorrect
                       ? "bg-green-500 text-white"
                       : "bg-red-500 text-white"
@@ -83,26 +113,10 @@ export default function QuizBox({ quizData }: { quizData: Question[] }) {
       </CardContent>
       <CardFooter className="flex justify-between">
         {currentQuestionIndex > 0 && (
-          <Button
-            onClick={() => {
-              setCurrentQuestionIndex(currentQuestionIndex - 1);
-              setSelectedAnswer(null);
-              setIsAnswerCorrect(null);
-            }}
-          >
-            Back
-          </Button>
+          <Button onClick={handlePreviousQuestion}>Back</Button>
         )}
         {currentQuestionIndex < quizData.length - 1 && (
-          <Button
-            onClick={() => {
-              setCurrentQuestionIndex(currentQuestionIndex + 1);
-              setSelectedAnswer(null);
-              setIsAnswerCorrect(null);
-            }}
-          >
-            Next Question
-          </Button>
+          <Button onClick={handleNextQuestion}>Next Question</Button>
         )}
       </CardFooter>
     </Card>
