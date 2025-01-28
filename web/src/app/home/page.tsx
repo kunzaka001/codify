@@ -28,6 +28,16 @@ import {
 } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface UserData {
   id: string;
@@ -109,13 +119,100 @@ export default function Home() {
           <div className="group cursor-pointer" onClick={handleUserPageNav}>
             <Avatar className="transform transition-transform duration-300 group-hover:scale-105">
               <AvatarImage src={userData?.userImg ?? placeholdUserImage.src} />
-              <AvatarFallback>US</AvatarFallback>
+              <AvatarFallback>
+                {userData?.userName ? userData.userName.slice(0, 2) : "US"}
+              </AvatarFallback>
             </Avatar>
           </div>
         </div>
-        <div className="flex-col flex-grow flex justify-center items-center">
-          <h1 className="font-bold text-center">This is a home page</h1>
-          <Drawer>
+        <div className="relative">
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-[90%] max-w-sm z-50">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Caution!</AlertTitle>
+              <AlertDescription>
+                Codify is now in Beta and Currently Incompleted. Only Casual
+                Play is Avaiable. Have fun!
+              </AlertDescription>
+            </Alert>
+          </div>
+        </div>
+        <div className="flex flex-col flex-grow justify-center items-center">
+          <div className="w-full max-w-sm p-4">
+            <Card className="shadow-lg rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">
+                  Casual Play
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-400">
+                  Casual Play. Is a mode that you can practice your knowledge
+                  about a topic of your choice!=
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button className="w-full">Play!</Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>
+                        Ready to Dive in? Choose your options!
+                      </DrawerTitle>
+                      <DrawerDescription>
+                        Choose your options for casual mode.
+                      </DrawerDescription>
+                    </DrawerHeader>
+                    <div className="w-full space-y-3 px-4 py-2">
+                      <Select
+                        onValueChange={(value) => setSelectedCategory(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Category</SelectLabel>
+                            <SelectItem value="code">Code</SelectItem>
+                            <SelectItem value="linux">Linux</SelectItem>
+                            <SelectItem value="react">React</SelectItem>
+                            <SelectItem value="devops">Devops</SelectItem>
+                            <SelectItem value="django">Django</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        onValueChange={(value) => setSelectedDifficulty(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your Difficulties" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Difficulty</SelectLabel>
+                            <SelectItem value="easy">Easy</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="hard">Hard</SelectItem>
+                            <SelectItem value="any">Any Difficulty</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <DrawerFooter>
+                      <Button onClick={handleSubmit}>Submit</Button>
+                      <DrawerClose>
+                        <Button className="w-full" variant="outline">
+                          Cancel
+                        </Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* <Drawer>
             <DrawerTrigger>
               <Button>Play!</Button>
             </DrawerTrigger>
@@ -168,7 +265,7 @@ export default function Home() {
                 </DrawerClose>
               </DrawerFooter>
             </DrawerContent>
-          </Drawer>
+          </Drawer> */}
         </div>
       </div>
     </>

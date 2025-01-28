@@ -83,7 +83,9 @@ export default function User() {
         <div className="flex flex-col items-center justify-center space-y-4 max-w-sm w-full">
           <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
             <AvatarImage src={userData?.userImg ?? placeholdUserImage.src} />
-            <AvatarFallback>US</AvatarFallback>
+            <AvatarFallback>
+              {userData?.userName ? userData.userName.slice(0, 2) : "US"}
+            </AvatarFallback>
           </Avatar>
           <div className="text-center">
             <p className="text-lg font-medium sm:text-xl">{userData?.email}</p>
