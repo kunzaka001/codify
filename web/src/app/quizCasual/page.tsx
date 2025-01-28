@@ -23,8 +23,12 @@ interface Question {
 
 function QuizCasualComponent({
   onQuestionChange,
+  setCategory,
+  setDifficulty,
 }: {
   onQuestionChange: (currentIndex: number) => void;
+  setCategory: (category: string) => void;
+  setDifficulty: (category: string) => void;
 }) {
   const [quizData, setQuizData] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,12 +38,12 @@ function QuizCasualComponent({
 
   useEffect(() => {
     async function fetchQuizData() {
-      const category = searchParams.get("category") || null;
-      const difficulty = searchParams.get("difficulty") || null;
+      const category = searchParams.get("category") || "";
+      const difficulty = searchParams.get("difficulty") || "";
 
       try {
         const response = await fetch(
-          `http://localhost:3000/quiz?category=${category}&difficulty=${difficulty}`
+          `https://codify-api-drxm.onrender.com/quiz?category=${category}&difficulty=${difficulty}`
         );
 
         if (!response.ok) {
@@ -48,6 +52,8 @@ function QuizCasualComponent({
 
         const data: Question[] = await response.json();
         setQuizData(data);
+        setCategory(category);
+        setDifficulty(difficulty);
         setIsLoading(false);
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -61,7 +67,7 @@ function QuizCasualComponent({
     }
 
     fetchQuizData();
-  }, [searchParams]);
+  }, [searchParams, setCategory, setDifficulty]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -80,9 +86,12 @@ function QuizCasualComponent({
 
 export default function Quiz_Casual() {
   const [percentage, setPercentage] = useState(0);
+  const [category, setCategory] = useState<string>("");
+  const [difficulty, setDifficulty] = useState<string>("");
 
   const handleQuestionChange = (currentIndex: number) => {
-    const progress = ((currentIndex + 1) / 10) * 100; // Assuming 10 total questions
+    const progress = currentIndex * 10;
+
     setPercentage(progress);
   };
 
@@ -102,7 +111,17 @@ export default function Quiz_Casual() {
           })}
         />
       </div>
-      <QuizCasualComponent onQuestionChange={handleQuestionChange} />
+      <div className="absolute top-0 left-0 ml-5 mt-4">
+        <h1>
+          Category: {category || "No Category Selected"}, Difficulty:{" "}
+          {difficulty || "No Difficulty Selected"}
+        </h1>
+      </div>
+      <QuizCasualComponent
+        onQuestionChange={handleQuestionChange}
+        setCategory={setCategory}
+        setDifficulty={setDifficulty}
+      />
     </Suspense>
   );
 }
