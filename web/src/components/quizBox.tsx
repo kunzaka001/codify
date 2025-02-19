@@ -31,9 +31,11 @@ interface Question {
 export default function QuizBox({
   quizData,
   onQuestionChange,
+  mode,
 }: {
   quizData: Question[];
   onQuestionChange: (currentIndex: number) => void;
+  mode: string;
 }) {
   const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -48,7 +50,7 @@ export default function QuizBox({
   }, [currentQuestionIndex, onQuestionChange]);
 
   if (!quizData || quizData.length === 0) {
-    return <p>No quiz data available</p>;
+    return <p>Loading...</p>;
   }
 
   const currentQuestion = quizData[currentQuestionIndex];
@@ -84,10 +86,28 @@ export default function QuizBox({
   if (isQuizComplete) {
     return (
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Quiz Complete!</h1>
-        <p className="text-xl">
-          Your score: {score}/{quizData.length}
-        </p>
+        {mode === "casual" ? (
+          <>
+            <h1 className="text-2xl font-bold">Quiz Complete!</h1>
+            <p className="text-xl">
+              Your score: {score}/{quizData.length}
+            </p>
+          </>
+        ) : mode === "rank" ? (
+          <>
+            <h1 className="text-2xl font-bold text-red-500">
+              Rank Match Completed!
+            </h1>
+            <p className="text-xl">Your score: {score}</p>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold">Quiz Finished!</h1>
+            <p className="text-xl">
+              Your total score: {score}/{quizData.length}
+            </p>
+          </>
+        )}
         <Button onClick={handleUserPageNav}>Back to Home</Button>
       </div>
     );
