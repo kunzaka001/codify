@@ -8,7 +8,8 @@
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
     "dotenv": "^16.4.7",
-    "elysia": "latest"
+    "elysia": "latest",
+    "firebase": "^11.3.1"
   },
   "devDependencies": {
     "bun-types": "latest"
