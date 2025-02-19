@@ -111,7 +111,7 @@ export default function Home() {
   };
 
   const handleSubmitRank = () => {
-    router.push(`/quizCasual?mode=rank&category=any}&difficulty=hard`);
+    router.push(`/quizCasual?mode=rank&category=any&difficulty=hard`);
   };
 
   return (
@@ -131,8 +131,8 @@ export default function Home() {
         </div>
         <div className="relative">
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-[90%] max-w-sm z-50">
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
+            <Alert className="border-l-4 border-yellow-500 text-yellow-700">
+              <AlertCircle className="h-4 w-4" color="#e3d002" />
               <AlertTitle>Caution!</AlertTitle>
               <AlertDescription>
                 Codify is now in Beta and Currently Incompleted. Only Casual
@@ -203,7 +203,7 @@ export default function Home() {
                       </Select>
                     </div>
                     <DrawerFooter>
-                      <Button onClick={handleSubmit}>Submit</Button>
+                      <Button onClick={handleSubmit}>Let go!</Button>
                       <DrawerClose>
                         <Button className="w-full" variant="outline">
                           Cancel
@@ -239,7 +239,7 @@ export default function Home() {
                       </DrawerDescription>
                     </DrawerHeader>
                     <DrawerFooter>
-                      <Button onClick={handleSubmitRank}>Submit</Button>
+                      <Button onClick={handleSubmitRank}>Let go!</Button>
                       <DrawerClose>
                         <Button className="w-full" variant="outline">
                           Cancel
