@@ -5,7 +5,7 @@ import { cors } from "@elysiajs/cors";
 const app = new Elysia()
   .use(cors())
   .get("/quiz", async ({ query }) => {
-    const { category = "code", difficulty = "easy", limit = "10" } = query;
+    const { category = "code", difficulty = "easy", limit = "20" } = query;
     const API_KEY = process.env.QUIZ_API_KEY;
 
     const checkData = (dataCategory: any) => {
@@ -25,7 +25,6 @@ const app = new Elysia()
           .filter(([key, value]) => value !== null)
           .map(([key, value]) => ({ id: key, text: value }));
 
-        // Shuffle the answers
         shuffleArray(answers);
 
         return {
@@ -55,6 +54,14 @@ const app = new Elysia()
       if (difficulty == "any") {
         response = await fetch(
           `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&limit=${limit}`
+        );
+      } else if (category == "any") {
+        response = await fetch(
+          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&difficulty=${difficulty}&limit=${limit}`
+        );
+      } else if (category == "any" && difficulty == "any") {
+        response = await fetch(
+          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&limit=${limit}`
         );
       } else {
         response = await fetch(
