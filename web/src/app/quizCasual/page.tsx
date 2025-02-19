@@ -7,6 +7,8 @@ import QuizBox from "@/components/quizBox";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
+import { openDatabase } from "@/lib/openDatabase";
+
 interface Question {
   question: string;
   description: string | null;
@@ -19,6 +21,14 @@ interface Question {
   tags: string[];
   difficulty: string;
   category: string;
+}
+
+interface UserData {
+  id: string;
+  email: string | null;
+  userImg: string | null;
+  userName: string | null;
+  highScore: number;
 }
 
 function QuizCasualComponent({
@@ -36,6 +46,40 @@ function QuizCasualComponent({
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const [mode, setMode] = useState("none");
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const db = await openDatabase();
+        const transaction = db.transaction("userData", "readonly");
+        const objectStore = transaction.objectStore("userData");
+
+        const request = objectStore.openCursor();
+
+        request.onsuccess = (event) => {
+          const cursor = (event.target as IDBRequest).result;
+          if (cursor) {
+            console.log("Data retrieved:", cursor.value);
+            setUserData(cursor.value);
+          } else {
+            console.log("No data found");
+          }
+        };
+
+        request.onerror = (event) => {
+          console.error(
+            "Failed to retrieve data:",
+            (event.target as IDBRequest).error
+          );
+        };
+      } catch (error) {
+        console.error("Error opening database:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     async function fetchQuizData() {
@@ -46,62 +90,32 @@ function QuizCasualComponent({
       setMode(mode);
       console.log(mode);
 
-      if (mode == "casual") {
-        try {
-          const response = await fetch(
-            `https://codify-api-drxm.onrender.com/quiz?category=${category}&difficulty=${difficulty}`
-            /* `http://localhost:3000/quiz?category=${category}&difficulty=${difficulty}` */
-          );
-          console.log("Fetch response:", response); //debug
+      try {
+        const response = await fetch(
+          `https://codify-api-drxm.onrender.com/quiz?mode=${mode}&category=${category}&difficulty=${difficulty}`
+          /* `http://localhost:3000/quiz?mode=${mode}&category=${category}&difficulty=${difficulty}` */
+        );
+        console.log("Fetch response:", response); //debug
 
-          if (!response.ok) {
-            throw new Error(`Failed to fetch data: ${response.statusText}`);
-          }
-
-          const data: Question[] = await response.json();
-          setQuizData(data);
-          setCategory(category);
-          setDifficulty(difficulty);
-          console.log(data); // debug
-        } catch (err: unknown) {
-          console.error("Fetch error:", err); //debug
-          if (err instanceof Error) {
-            setError(`Failed to fetch data: ${err.message}`);
-          } else {
-            setError("An unknown error occurred");
-          }
-        } finally {
-          console.log("Setting loading to false"); //debug
-          setIsLoading(false);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data: ${response.statusText}`);
         }
-      } else if (mode == "rank") {
-        try {
-          const response = await fetch(
-            `https://codify-api-drxm.onrender.com/quiz?category=${category}&difficulty=${difficulty}`
-            /* `http://localhost:3000/quiz?category=${category}&difficulty=${difficulty}` */
-          );
-          console.log("Fetch response:", response); //debug
 
-          if (!response.ok) {
-            throw new Error(`Failed to fetch data: ${response.statusText}`);
-          }
-
-          const data: Question[] = await response.json();
-          setQuizData(data);
-          setCategory(category);
-          setDifficulty(difficulty);
-          console.log(data); // debug
-        } catch (err: unknown) {
-          console.error("Fetch error:", err); //debug
-          if (err instanceof Error) {
-            setError(`Failed to fetch data: ${err.message}`);
-          } else {
-            setError("An unknown error occurred");
-          }
-        } finally {
-          console.log("Setting loading to false"); //debug
-          setIsLoading(false);
+        const data: Question[] = await response.json();
+        setQuizData(data);
+        setCategory(category);
+        setDifficulty(difficulty);
+        console.log(data); // debug
+      } catch (err: unknown) {
+        console.error("Fetch error:", err); //debug
+        if (err instanceof Error) {
+          setError(`Failed to fetch data: ${err.message}`);
+        } else {
+          setError("An unknown error occurred");
         }
+      } finally {
+        console.log("Setting loading to false"); //debug
+        setIsLoading(false);
       }
     }
 
@@ -118,6 +132,9 @@ function QuizCasualComponent({
         quizData={quizData}
         onQuestionChange={onQuestionChange}
         mode={mode}
+        userEmail={userData?.email}
+        userName={userData?.userName}
+        highScore={userData?.highScore}
       />
     </div>
   );

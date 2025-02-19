@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
+import axios from "axios";
+
 interface Question {
   question: string;
   description: string | null;
@@ -32,10 +34,16 @@ export default function QuizBox({
   quizData,
   onQuestionChange,
   mode,
+  userName,
+  userEmail,
+  highScore,
 }: {
   quizData: Question[];
   onQuestionChange: (currentIndex: number) => void;
   mode: string;
+  userName: string | null | undefined;
+  userEmail: string | null | undefined;
+  highScore?: number;
 }) {
   const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -83,6 +91,29 @@ export default function QuizBox({
     router.push("/home");
   };
 
+  const handleRankUserPageNav = async () => {
+    try {
+      const currentHighScore = highScore ?? 0;
+      if (score > currentHighScore) {
+        const response = await axios.post("http://localhost:3000/submitscore", {
+          name: userName,
+          email: userEmail,
+          score: score,
+        });
+
+        if (response.status === 200) {
+          router.push("/home");
+        } else {
+          console.error("Error:", response.statusText);
+        }
+      } else {
+        router.push("/home");
+      }
+    } catch (error: any) {
+      console.error("Error:", error.message);
+    }
+  };
+
   if (isQuizComplete) {
     return (
       <div className="text-center">
@@ -92,6 +123,7 @@ export default function QuizBox({
             <p className="text-xl">
               Your score: {score}/{quizData.length}
             </p>
+            <Button onClick={handleUserPageNav}>Back to Home</Button>
           </>
         ) : mode === "rank" ? (
           <>
@@ -99,6 +131,7 @@ export default function QuizBox({
               Rank Match Completed!
             </h1>
             <p className="text-xl">Your score: {score}</p>
+            <Button onClick={handleRankUserPageNav}>Back to Home</Button>
           </>
         ) : (
           <>
@@ -106,9 +139,9 @@ export default function QuizBox({
             <p className="text-xl">
               Your total score: {score}/{quizData.length}
             </p>
+            <Button onClick={handleUserPageNav}>Back to Home</Button>
           </>
         )}
-        <Button onClick={handleUserPageNav}>Back to Home</Button>
       </div>
     );
   }
