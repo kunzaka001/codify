@@ -2,10 +2,19 @@ import { Elysia } from "elysia";
 import "dotenv/config";
 import { cors } from "@elysiajs/cors";
 
+import db from "../libs/firebase-db";
+import { doc, setDoc, getDocs, collection } from "firebase/firestore";
+
+interface SubmitScoreBody {
+  name: string;
+  email: string;
+  score: number;
+}
+
 const app = new Elysia()
   .use(cors())
   .get("/quiz", async ({ query }) => {
-    const { category = "code", difficulty = "easy", limit = "20" } = query;
+    const { category, difficulty, mode } = query;
     const API_KEY = process.env.QUIZ_API_KEY;
 
     const checkData = (dataCategory: any) => {
@@ -51,21 +60,17 @@ const app = new Elysia()
     let response;
 
     try {
-      if (difficulty == "any") {
+      if (mode == "casual") {
         response = await fetch(
-          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&limit=${limit}`
+          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&difficulty=${difficulty}&limit=${10}`
         );
-      } else if (category == "any") {
+      } else if (mode == "rank") {
         response = await fetch(
-          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&difficulty=${difficulty}&limit=${limit}`
-        );
-      } else if (category == "any" && difficulty == "any") {
-        response = await fetch(
-          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&limit=${limit}`
+          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&difficulty=${difficulty}&limit=${20}`
         );
       } else {
         response = await fetch(
-          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&difficulty=${difficulty}&limit=${limit}`
+          `https://quizapi.io/api/v1/questions?apiKey=${API_KEY}&category=${category}&difficulty=${difficulty}&limit=${10}`
         );
       }
 
@@ -79,6 +84,33 @@ const app = new Elysia()
       return { error: error.message };
     }
   })
+
+  .post("/submitscore", async ({ body }) => {
+    const { name, email, score } = body as SubmitScoreBody;
+    try {
+      await setDoc(doc(db, "Leaderboard", email), {
+        name: name,
+        score: score,
+      });
+      console.log;
+    } catch (error: any) {
+      return { error: error.message };
+    }
+  })
+
+  .get("/getleaderboard", async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "Leaderboard"));
+      const leaderboardData = querySnapshot.docs.map((doc) => ({
+        email: doc.id,
+        ...doc.data(),
+      }));
+      return { data: leaderboardData };
+    } catch (error: any) {
+      return { error: error.message };
+    }
+  })
+
   .listen(process.env.PORT || 3000, () => {
     console.log(
       `Elysia app running at http://localhost:${process.env.PORT || 3000}`
