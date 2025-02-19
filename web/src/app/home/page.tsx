@@ -105,9 +105,13 @@ export default function Home() {
       });
     } else {
       router.push(
-        `/quizCasual?category=${selectedCategory}&difficulty=${selectedDifficulty}`
+        `/quizCasual?mode=casual&category=${selectedCategory}&difficulty=${selectedDifficulty}`
       );
     }
+  };
+
+  const handleSubmitRank = () => {
+    router.push(`/quizCasual?mode=rank&category=any}&difficulty=hard`);
   };
 
   return (
@@ -137,7 +141,7 @@ export default function Home() {
             </Alert>
           </div>
         </div>
-        <div className="flex flex-col flex-grow justify-center items-center">
+        <div className="flex flex-grow justify-center items-center">
           <div className="w-full max-w-sm p-4">
             <Card className="shadow-lg rounded-2xl">
               <CardHeader>
@@ -146,7 +150,7 @@ export default function Home() {
                 </CardTitle>
                 <CardDescription className="text-sm text-gray-400">
                   Casual Play. Is a mode that you can practice your knowledge
-                  about a topic of your choice!=
+                  about a topic of your choice!
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -211,61 +215,42 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
-
-          {/* <Drawer>
-            <DrawerTrigger>
-              <Button>Play!</Button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerTitle>
-                  Ready to Dive in? Choose your options!
-                </DrawerTitle>
-                <DrawerDescription>
-                  Choose your options for casual mode.
-                </DrawerDescription>
-              </DrawerHeader>
-              <div className="w-full space-y-3 px-4 py-2">
-                <Select onValueChange={(value) => setSelectedCategory(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Category</SelectLabel>
-                      <SelectItem value="code">Code</SelectItem>
-                      <SelectItem value="linux">Linux</SelectItem>
-                      <SelectItem value="react">React</SelectItem>
-                      <SelectItem value="devops">Devops</SelectItem>
-                      <SelectItem value="django">Django</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <Select onValueChange={(value) => setSelectedDifficulty(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your Difficulties" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Difficulty</SelectLabel>
-                      <SelectItem value="easy">Easy</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="hard">Hard</SelectItem>
-                      <SelectItem value="any">Any Difficulty</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-              <DrawerFooter>
-                <Button onClick={handleSubmit}>Submit</Button>
-                <DrawerClose>
-                  <Button className="w-full" variant="outline">
-                    Cancel
-                  </Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer> */}
+          <div className="w-full max-w-sm p-4">
+            <Card className="shadow-lg rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">
+                  Competitive
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-400">
+                  Competitive. Is mode for you to trying to be the best. And be
+                  the top on the leader board.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button className="w-full">Play!</Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>Ready!?</DrawerTitle>
+                      <DrawerDescription>
+                        Get ready to grind some score. It will be hard mode and
+                      </DrawerDescription>
+                    </DrawerHeader>
+                    <DrawerFooter>
+                      <Button onClick={handleSubmitRank}>Submit</Button>
+                      <DrawerClose>
+                        <Button className="w-full" variant="outline">
+                          Cancel
+                        </Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </>
