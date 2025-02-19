@@ -27,6 +27,7 @@ interface UserData {
   email: string | null;
   userImg: string | null;
   userName: string | null;
+  highScore: 0 | null;
 }
 
 export default function Home() {
@@ -107,6 +108,7 @@ export default function Home() {
         email: user.email,
         userImg: user.photoURL,
         userName: user.displayName,
+        highScore: 0,
       });
       if (router) {
         router.push("/home");
