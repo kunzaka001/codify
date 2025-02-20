@@ -112,8 +112,12 @@ export default function QuizBox({
       } else {
         router.push("/home");
       }
-    } catch (error: any) {
-      console.error("Error:", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+      } else {
+        console.error("An unexpected error occurred:", error);
+      }
     }
   };
 
