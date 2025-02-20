@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
-import app from "../lib/firebase-config.js";
+import app from "../lib/firebase-config";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { openDatabase } from "../lib/openDatabase";
 
 import {
   SquareLibrary,
@@ -21,15 +22,24 @@ import {
 
 import CodifyLogo from "./assets/CodifyNewLogo.png";
 
+import db from "@/lib/firebase-db";
+import { doc, setDoc } from "firebase/firestore";
+
 interface UserData {
   id: string;
   email: string | null;
   userImg: string | null;
+  userName: string | null;
+  highScore: 0 | null;
+}
+
+interface FirebaseUserData {
+  name: string;
+  highScore: number;
 }
 
 export default function Home() {
   const router = useRouter();
-  const dbName = "CodifyDB";
   const storeName = "userData";
 
   useEffect(() => {
@@ -67,33 +77,8 @@ export default function Home() {
     checkIfDataExists();
   }, [router]);
 
-  async function openDatabase() {
-    return new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
-
-      request.onupgradeneeded = (event: Event) => {
-        const db = (event.target as IDBRequest).result as IDBDatabase;
-
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName, { keyPath: "id" });
-        }
-      };
-
-      request.onsuccess = () => {
-        resolve(request.result as IDBDatabase);
-      };
-
-      request.onerror = (event: Event) => {
-        const errorEvent = event as ErrorEvent;
-        if (errorEvent.target) {
-          reject((errorEvent.target as IDBRequest).error);
-        }
-      };
-    });
-  }
-
   async function addOrUpdateUserData(data: UserData) {
-    const db = (await openDatabase()) as IDBDatabase;
+    const db = await openDatabase();
 
     return new Promise<string>((resolve, reject) => {
       const transaction = db.transaction(storeName, "readwrite");
@@ -119,6 +104,20 @@ export default function Home() {
     });
   }
 
+  const createDocument = async (
+    collectionName: string,
+    docId: string,
+    data: FirebaseUserData
+  ): Promise<void> => {
+    try {
+      const docRef = doc(db, collectionName, docId); // Reference to the document with custom ID
+      await setDoc(docRef, data); // Create or overwrite the document
+      console.log("Document written with ID:", docId);
+    } catch (error) {
+      console.error("Error adding document:", error);
+    }
+  };
+
   const signinWithGoogle = async () => {
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
@@ -130,7 +129,20 @@ export default function Home() {
         id: user.uid,
         email: user.email,
         userImg: user.photoURL,
+        userName: user.displayName,
+        highScore: 0,
       });
+
+      if (!user.email) {
+        console.error("User email is null, cannot create document.");
+        return;
+      }
+
+      await createDocument("Users", user.email, {
+        name: user.displayName ?? "Unknown User",
+        highScore: 0,
+      });
+
       if (router) {
         router.push("/home");
       }
@@ -171,13 +183,13 @@ export default function Home() {
       icon: <Timer className="size-6" />,
     },
     {
-      title: "LLM Helper",
+      title: "LLM Helper *In Development*",
       description:
         "A powerful AI-driven assistant designed to enhance learning and productivity. This Large Language Model Helper provides instant answers, coding solutions, and insightful explanations to assist developers in solving challenges efficiently.",
       icon: <BotMessageSquare className="size-6" />,
     },
     {
-      title: "Machine Learning Analysis",
+      title: "Machine Learning Analysis *In Development*",
       description:
         "Harness the power of Machine Learning to analyze data, identify patterns, and make intelligent evaluations. This feature leverages advanced models to provide actionable insights and predictions for complex challenges.",
       icon: <BrainCog className="size-6" />,
