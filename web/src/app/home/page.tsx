@@ -39,8 +39,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import apiEndpoint from "@/lib/config";
-
 interface UserData {
   id: string;
   email: string | null;
