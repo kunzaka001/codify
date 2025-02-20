@@ -9,6 +9,11 @@ import "react-circular-progressbar/dist/styles.css";
 
 import { openDatabase } from "@/lib/openDatabase";
 
+import db from "@/lib/firebase-db";
+import { collection, doc, getDoc } from "firebase/firestore";
+
+import apiEndpoint from "@/lib/config";
+
 interface Question {
   question: string;
   description: string | null;
@@ -36,17 +41,20 @@ function QuizCasualComponent({
   setCategory,
   setDifficulty,
   setIsLoading,
+  isTimeUp,
 }: {
   onQuestionChange: (currentIndex: number) => void;
   setCategory: (category: string) => void;
   setDifficulty: (category: string) => void;
   setIsLoading: (loading: boolean) => void;
+  isTimeUp: boolean;
 }) {
   const [quizData, setQuizData] = useState<Question[]>([]);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const [mode, setMode] = useState("none");
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [highScore, setHighScore] = useState(Number);
 
   useEffect(() => {
     async function fetchData() {
@@ -92,8 +100,8 @@ function QuizCasualComponent({
 
       try {
         const response = await fetch(
-          `https://codify-api-drxm.onrender.com/quiz?mode=${mode}&category=${category}&difficulty=${difficulty}`
-          /* `http://localhost:3000/quiz?mode=${mode}&category=${category}&difficulty=${difficulty}` */
+          /* `https://codify-api-drxm.onrender.com/quiz?mode=${mode}&category=${category}&difficulty=${difficulty}` */
+          `${apiEndpoint}/quiz?mode=${mode}&category=${category}&difficulty=${difficulty}`
         );
         console.log("Fetch response:", response); //debug
 
@@ -122,6 +130,30 @@ function QuizCasualComponent({
     fetchQuizData();
   }, [searchParams, setCategory, setDifficulty, setIsLoading]);
 
+  useEffect(() => {
+    async function getFieldFromDocument(email: string) {
+      // Reference to the specific document
+      const docRef = doc(db, "Users", email);
+
+      try {
+        // Fetch the document snapshot
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          // Extract the specific field
+          const fieldValue = docSnap.get("highScore");
+          console.log("Field Value:", fieldValue);
+          setHighScore(fieldValue);
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching document:", error);
+      }
+    }
+    getFieldFromDocument(userData?.email ?? "Placehold.email");
+  });
+
   if (error) {
     return <div>{error}</div>;
   }
@@ -134,7 +166,8 @@ function QuizCasualComponent({
         mode={mode}
         userEmail={userData?.email}
         userName={userData?.userName}
-        highScore={userData?.highScore}
+        highScore={highScore}
+        isTimeUp={isTimeUp}
       />
     </div>
   );
@@ -142,9 +175,34 @@ function QuizCasualComponent({
 
 export default function Quiz_Casual() {
   const [percentage, setPercentage] = useState(0);
+  const [timer, setTimer] = useState(15);
   const [category, setCategory] = useState<string>("");
   const [difficulty, setDifficulty] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isTimeUp, setIsTimeUp] = useState(false); // Added state for timer
+  const [mode, setMode] = useState<string>("");
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const modeParam = searchParams.get("mode") || "";
+    setMode(modeParam);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isLoading) return; // Don't start timer if loading
+
+    if (timer <= 0) {
+      setIsTimeUp(true);
+      return; // Exit if time is up
+    }
+
+    const timerInterval = setInterval(() => {
+      setTimer((prevTime) => prevTime - 1);
+    }, 1000);
+
+    return () => clearInterval(timerInterval); // Cleanup on unmount or if timer changes
+  }, [isLoading, timer]);
 
   const handleQuestionChange = (currentIndex: number) => {
     const progress = (currentIndex + 1) * 10;
@@ -159,6 +217,7 @@ export default function Quiz_Casual() {
         setCategory={setCategory}
         setDifficulty={setDifficulty}
         setIsLoading={setIsLoading}
+        isTimeUp={isTimeUp}
       />
       {isLoading ? (
         <div className="flex justify-center items-center min-h-screen">
@@ -166,19 +225,31 @@ export default function Quiz_Casual() {
         </div>
       ) : (
         <>
-          <div className="absolute top-0 right-0 mr-5 mt-4 h-16 w-16">
-            <CircularProgressbar
-              minValue={0}
-              maxValue={101}
-              value={percentage}
-              text={`${percentage.toFixed(0)}%`}
-              styles={buildStyles({
-                pathColor: "#22c55e",
-                textColor: "#22c55e",
-                trailColor: "#d1fae5",
-              })}
-            />
-          </div>
+          {mode === "casual" ? (
+            <div className="absolute top-0 right-0 mr-5 mt-4 h-16 w-16">
+              <CircularProgressbar
+                value={percentage}
+                text={`${percentage.toFixed(0)}%`}
+                styles={buildStyles({
+                  pathColor: "#22c55e",
+                  textColor: "#22c55e",
+                  trailColor: "#d1fae5",
+                })}
+              />
+            </div>
+          ) : mode === "rank" ? (
+            <div className="absolute top-0 right-0 mr-5 mt-4 h-16 w-16">
+              <CircularProgressbar
+                value={timer}
+                text={`${timer.toFixed(0)}`}
+                styles={buildStyles({
+                  pathColor: "#22c55e",
+                  textColor: "#22c55e",
+                  trailColor: "#d1fae5",
+                })}
+              />
+            </div>
+          ) : null}
           <div className="absolute top-0 left-0 ml-5 mt-4">
             <h1>
               Category: {category || "No Category Selected"}, Difficulty:{" "}

@@ -22,12 +22,20 @@ import {
 
 import CodifyLogo from "./assets/CodifyNewLogo.png";
 
+import db from "@/lib/firebase-db";
+import { collection, doc, setDoc } from "firebase/firestore";
+
 interface UserData {
   id: string;
   email: string | null;
   userImg: string | null;
   userName: string | null;
   highScore: 0 | null;
+}
+
+interface FirebaseUserData {
+  name: string;
+  highScore: number;
 }
 
 export default function Home() {
@@ -96,6 +104,20 @@ export default function Home() {
     });
   }
 
+  const createDocument = async (
+    collectionName: string,
+    docId: string,
+    data: FirebaseUserData
+  ): Promise<void> => {
+    try {
+      const docRef = doc(db, collectionName, docId); // Reference to the document with custom ID
+      await setDoc(docRef, data); // Create or overwrite the document
+      console.log("Document written with ID:", docId);
+    } catch (error) {
+      console.error("Error adding document:", error);
+    }
+  };
+
   const signinWithGoogle = async () => {
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
@@ -110,6 +132,17 @@ export default function Home() {
         userName: user.displayName,
         highScore: 0,
       });
+
+      if (!user.email) {
+        console.error("User email is null, cannot create document.");
+        return;
+      }
+
+      await createDocument("Users", user.email, {
+        name: user.displayName ?? "Unknown User",
+        highScore: 0,
+      });
+
       if (router) {
         router.push("/home");
       }

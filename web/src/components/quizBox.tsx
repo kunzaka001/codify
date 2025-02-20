@@ -15,6 +15,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import axios from "axios";
+import apiEndpoint from "@/lib/config";
 
 interface Question {
   question: string;
@@ -37,6 +38,7 @@ export default function QuizBox({
   userName,
   userEmail,
   highScore,
+  isTimeUp,
 }: {
   quizData: Question[];
   onQuestionChange: (currentIndex: number) => void;
@@ -44,6 +46,7 @@ export default function QuizBox({
   userName: string | null | undefined;
   userEmail: string | null | undefined;
   highScore?: number;
+  isTimeUp: boolean;
 }) {
   const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -95,7 +98,7 @@ export default function QuizBox({
     try {
       const currentHighScore = highScore ?? 0;
       if (score > currentHighScore) {
-        const response = await axios.post("http://localhost:3000/submitscore", {
+        const response = await axios.post(`${apiEndpoint}/submitscore`, {
           name: userName,
           email: userEmail,
           score: score,
@@ -114,7 +117,7 @@ export default function QuizBox({
     }
   };
 
-  if (isQuizComplete) {
+  if (isQuizComplete || (mode === "rank" && isTimeUp)) {
     return (
       <div className="text-center">
         {mode === "casual" ? (
@@ -127,7 +130,7 @@ export default function QuizBox({
           </>
         ) : mode === "rank" ? (
           <>
-            <h1 className="text-2xl font-bold text-red-500">
+            <h1 className="text-2xl font-bold text-emerald-600">
               Rank Match Completed!
             </h1>
             <p className="text-xl">Your score: {score}</p>
