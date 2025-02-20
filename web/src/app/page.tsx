@@ -183,13 +183,13 @@ export default function Home() {
       icon: <Timer className="size-6" />,
     },
     {
-      title: "LLM Helper",
+      title: "LLM Helper *In Development*",
       description:
         "A powerful AI-driven assistant designed to enhance learning and productivity. This Large Language Model Helper provides instant answers, coding solutions, and insightful explanations to assist developers in solving challenges efficiently.",
       icon: <BotMessageSquare className="size-6" />,
     },
     {
-      title: "Machine Learning Analysis",
+      title: "Machine Learning Analysis *In Development*",
       description:
         "Harness the power of Machine Learning to analyze data, identify patterns, and make intelligent evaluations. This feature leverages advanced models to provide actionable insights and predictions for complex challenges.",
       icon: <BrainCog className="size-6" />,
