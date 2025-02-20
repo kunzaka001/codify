@@ -138,7 +138,9 @@ export default function QuizBox({
               Rank Match Completed!
             </h1>
             <p className="text-xl">Your score: {score}</p>
-            <Button onClick={handleRankUserPageNav}>Back to Home</Button>
+            <Button onClick={handleRankUserPageNav}>
+              Back to Home and Save score
+            </Button>
           </>
         ) : (
           <>
