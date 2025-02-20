@@ -1,3 +1,3 @@
-const apiEndpoint = "http://localhost:3000";
+const apiEndpoint = "https://codify-api-drxm.onrender.com";
 
 export default apiEndpoint;
