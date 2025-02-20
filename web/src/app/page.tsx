@@ -23,7 +23,7 @@ import {
 import CodifyLogo from "./assets/CodifyNewLogo.png";
 
 import db from "@/lib/firebase-db";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 interface UserData {
   id: string;
