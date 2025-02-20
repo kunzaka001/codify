@@ -92,7 +92,10 @@ const app = new Elysia()
         name: name,
         score: score,
       });
-      console.log;
+      await setDoc(doc(db, "Users", email), {
+        name: name,
+        highScore: score,
+      });
     } catch (error: any) {
       return { error: error.message };
     }
