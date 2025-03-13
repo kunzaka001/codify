@@ -153,8 +153,8 @@ export default function Home() {
               <AlertCircle className="h-4 w-4" color="#e3d002" />
               <AlertTitle>Caution!</AlertTitle>
               <AlertDescription>
-                Codify is now in Beta and Currently Incompleted. Only Casual
-                Play is Available. Have fun!
+                Codify is Currently in Beta and Incompleted. Only Casual
+                Mode and Competitive Mode is Available. Have fun!
               </AlertDescription>
             </Alert>
           </div>

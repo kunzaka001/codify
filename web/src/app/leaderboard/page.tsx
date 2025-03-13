@@ -49,17 +49,20 @@ export default function Leaderboard() {
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-full max-w-2xl mb-4">
-        <DataTable data={data} />
+    <>
+      <title>Leaderboard</title>
+      <div className="flex flex-col items-center">
+        <div className="w-full max-w-2xl mb-4">
+          <DataTable data={data} />
+        </div>
+        <Button
+          onClick={() => {
+            router.push("/home");
+          }}
+        >
+          Back
+        </Button>
       </div>
-      <Button
-        onClick={() => {
-          router.push("/home");
-        }}
-      >
-        Back
-      </Button>
-    </div>
+    </>
   );
 }
