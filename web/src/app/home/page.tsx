@@ -46,6 +46,25 @@ interface UserData {
   userName: string | null;
 }
 
+const categories = [
+  { label: "Programming", value: "Programming" },
+  { label: "DevOps", value: "DevOps" },
+  { label: "React", value: "React" },
+  { label: "JavaScript", value: "JavaScript" },
+  { label: "TypeScript", value: "TypeScript" },
+  { label: "Python", value: "Python" },
+  { label: "Docker", value: "Docker" },
+  { label: "Kubernetes", value: "Kubernetes" },
+];
+
+const difficulties = [
+  { label: "Easy", value: "easy" },
+  { label: "Medium", value: "medium" },
+  { label: "Hard", value: "hard" },
+  { label: "Expert", value: "expert" },
+  { label: "Any Difficulty", value: "any" },
+];
+
 export default function Home() {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -104,14 +123,26 @@ export default function Home() {
         },
       });
     } else {
-      router.push(
-        `/quizCasual?mode=casual&category=${selectedCategory}&difficulty=${selectedDifficulty}`
-      );
+      const params = new URLSearchParams({
+        mode: "casual",
+        category: selectedCategory,
+      });
+
+      if (selectedDifficulty !== "any") {
+        params.set("difficulty", selectedDifficulty);
+      }
+
+      router.push(`/quizCasual?${params.toString()}`);
     }
   };
 
   const handleSubmitRank = () => {
-    router.push(`/quizCasual?mode=rank&category=any&difficulty=hard`);
+    const params = new URLSearchParams({
+      mode: "rank",
+      difficulty: "hard",
+    });
+
+    router.push(`/quizCasual?${params.toString()}`);
   };
 
   return (
@@ -200,11 +231,14 @@ export default function Home() {
                           <SelectContent>
                             <SelectGroup>
                               <SelectLabel>Category</SelectLabel>
-                              <SelectItem value="code">Code</SelectItem>
-                              <SelectItem value="linux">Linux</SelectItem>
-                              <SelectItem value="react">React</SelectItem>
-                              <SelectItem value="devops">Devops</SelectItem>
-                              <SelectItem value="django">Django</SelectItem>
+                              {categories.map((category) => (
+                                <SelectItem
+                                  key={category.value}
+                                  value={category.value}
+                                >
+                                  {category.label}
+                                </SelectItem>
+                              ))}
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -219,12 +253,14 @@ export default function Home() {
                           <SelectContent>
                             <SelectGroup>
                               <SelectLabel>Difficulty</SelectLabel>
-                              <SelectItem value="easy">Easy</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="hard">Hard</SelectItem>
-                              <SelectItem value="any">
-                                Any Difficulty
-                              </SelectItem>
+                              {difficulties.map((difficulty) => (
+                                <SelectItem
+                                  key={difficulty.value}
+                                  value={difficulty.value}
+                                >
+                                  {difficulty.label}
+                                </SelectItem>
+                              ))}
                             </SelectGroup>
                           </SelectContent>
                         </Select>
