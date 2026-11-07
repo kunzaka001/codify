@@ -79,6 +79,7 @@ export default function User() {
 
   return (
     <>
+      <title>User</title>
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="flex flex-col items-center justify-center space-y-4 max-w-sm w-full">
           <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
