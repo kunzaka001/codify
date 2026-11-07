@@ -95,30 +95,34 @@ function QuizContent() {
         }
 
         const response = await fetch(`${apiEndpoint}/quiz?${params.toString()}`);
+        const payload = await response.json().catch(() => null);
+
+        const serverError =
+          payload && typeof payload === "object" && "error" in payload
+            ? String((payload as { error: unknown }).error)
+            : null;
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.statusText}`);
+          throw new Error(serverError || response.statusText || `HTTP ${response.status}`);
         }
 
-        const data: Question[] = await response.json();
-
-        if (!Array.isArray(data)) {
-          throw new Error("Unexpected response from the server");
+        if (!Array.isArray(payload)) {
+          throw new Error(serverError || "Unexpected response from the server");
         }
 
-        if (data.length === 0) {
+        if (payload.length === 0) {
           setError(
             "No questions found for that category and difficulty. Please choose another combination."
           );
           return;
         }
 
-        setQuizData(data);
+        setQuizData(payload);
         setCategory(categoryParam);
         setDifficulty(difficultyParam);
       } catch (err: unknown) {
         if (err instanceof Error) {
-          setError(`Failed to fetch data: ${err.message}`);
+          setError(`Unable to load quiz: ${err.message}`);
         } else {
           setError("An unknown error occurred");
         }
