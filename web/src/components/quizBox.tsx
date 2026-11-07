@@ -61,7 +61,7 @@ export default function QuizBox({
   }, [currentQuestionIndex, onQuestionChange]);
 
   if (!quizData || quizData.length === 0) {
-    return <p>Loading...</p>;
+    return <p>No questions available.</p>;
   }
 
   const currentQuestion = quizData[currentQuestionIndex];

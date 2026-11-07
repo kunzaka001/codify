@@ -85,15 +85,34 @@ function QuizContent() {
       setMode(modeParam);
 
       try {
-        const response = await fetch(
-          `${apiEndpoint}/quiz?mode=${modeParam}&category=${categoryParam}&difficulty=${difficultyParam}`
-        );
+        const params = new URLSearchParams({
+          mode: modeParam,
+          category: categoryParam,
+        });
+
+        if (difficultyParam) {
+          params.set("difficulty", difficultyParam);
+        }
+
+        const response = await fetch(`${apiEndpoint}/quiz?${params.toString()}`);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch data: ${response.statusText}`);
         }
 
         const data: Question[] = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("Unexpected response from the server");
+        }
+
+        if (data.length === 0) {
+          setError(
+            "No questions found for that category and difficulty. Please choose another combination."
+          );
+          return;
+        }
+
         setQuizData(data);
         setCategory(categoryParam);
         setDifficulty(difficultyParam);
